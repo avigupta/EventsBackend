@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-	post 'users/sign_up' => 'users#sign_up'
-	post 'users/sign_in' => 'users#sign_in'	
-	post 'events/create' => 'events#create'
+	get 'users/sign_up' => 'users#sign_up'
+	get 'users/sign_in' => 'users#sign_in'	
+	get 'events/create' => 'events#create'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
