@@ -29,6 +29,24 @@ class EventsController < ApplicationController
 		end
 	end
 
+	def info
+		if Event.find(params[:eventId])
+			event = Event.find(params[:eventId])
+			respond_to do |format|
+				format.html {render plain: event.id + " " + event.name, status: 200 }
+				format.json {render json: { eventId: event.id, name: event.name, location: event.location, description: event.description,
+					                        type: event.type, startTime: event.startTime, endTime: event.endTime, organization: event.organization,
+					                        publicEvent: event.publicEvent}, status: 200 }
+			end
+		elsif
+			respond_to do |format|
+				format.html {render plain: "Event not found", status: 400 }
+				format.json {render json: { msg: "Event not found" }, status: 400 }
+			end
+		end
+			
+			
+
 	def invite
 		usersInvited = Array.new
 		list = params[:list].split(",")
