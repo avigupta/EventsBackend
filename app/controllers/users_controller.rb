@@ -47,6 +47,11 @@ class UsersController < ApplicationController
 				format.html {render plain: "User doesn't exists", status: 400 }
 				format.json {render json: { msg: "User doesn't exists" }, status: 400 }
 			end
+		elsif not RegistrationId.where("email = ?", params[:email]).blank?
+			respond_to do |format|
+				format.html {render plain: "User already registered with gcm", status: 400 }
+				format.json {render json: { msg: "User already registered with gcm" }, status: 400 }
+			end
 		elsif regId.save
 			respond_to do |format|
 				format.html {render plain: "User registered for GCM", status: 200 }
