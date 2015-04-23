@@ -44,7 +44,7 @@ class EventsController < ApplicationController
 				format.json {render json: { msg: "Event not found" }, status: 400 }
 			end
 		end
-			
+	end
 			
 
 	def invite
