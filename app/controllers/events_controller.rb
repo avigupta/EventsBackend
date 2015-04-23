@@ -1,4 +1,7 @@
 class EventsController < ApplicationController
+	require 'gcm'
+	API_KEY = "AIzaSyBFn_H4dERP9vPqyPBtpFhseCB79dwodfA"
+
 	before_action :authenticate_user
 
 	def create
@@ -27,21 +30,52 @@ class EventsController < ApplicationController
 	end
 
 	def invite
-		list = params[:list]
+		usersInvited = Array.new
+		list = params[:list].split(",")
 		eventId = params[:eventId]
 		list.each do |x|
-			invitee = Invitee.new
-			invitee.email = x
-			invitee.status = "invited"
-			invitee.save
+			if Invitee.where("event_id = ? AND email = ?", params[:eventId], x).blank?
+				invitee = Invitee.new
+				invitee.email = x
+				invitee.event_id = params[:eventId]
+				invitee.status = "invited"
+				invitee.save
+				usersInvited << x
+			end
 		end
+		sendNotification(usersInvited)
+		sendEmail(usersInvited)
+
 		respond_to do |format|
 			format.html {render plain: "Invited users" }
-			format.json {render json: { status: 200, msg: "Invited users" } }
+			format.json {render json: { status: 200, msg: usersInvited } }
 		end
 	end
 
 	private	
+
+	def sendNotification(users)
+		gcm = GCM.new(API_KEY)
+		reg_ids = Array.new
+		users.each do |x|
+			if RegistrationId.find_by(email: x)
+				rUser = RegistrationId.find_by(email: x)
+				reg_ids << rUser.regId
+			end
+		end
+		options = {data: {eventId: params[:eventId], email: params[:email]}, collapse_key: "updated_score"}
+		response = gcm.send(reg_ids, options)
+	end
+
+	def sendEmail(users)
+		users.each do |x|
+			if not RegistrationId.find_by(email: x)
+				#TODO: send email to the user
+			end
+		end
+	end
+
+
 	def authenticate_user
 		if !User.find_by(email: params[:email])
 			respond_to do |format|
