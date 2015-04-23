@@ -18,13 +18,13 @@ class EventsController < ApplicationController
 	
 		if event.save
 			respond_to do |format|
-				format.html {render plain: "Event created. Id = #{event.id}" }
-				format.json {render json: { status: 200, eventId: event.id, msg: "Event created" } }
+				format.html {render plain: "Event created. Id = #{event.id}", status: 200 }
+				format.json {render json: { eventId: event.id, msg: "Event created" }, status: 200 }
 			end
 		elsif
 			respond_to do |format|
-				format.html {render plain: "Error in creating event" }
-				format.json {render json: { status: 400, msg: "Error in creating event" } }
+				format.html {render plain: "Error in creating event", status: 400 }
+				format.json {render json: { msg: "Error in creating event" }, status: 400 }
 			end
 		end
 	end
@@ -47,8 +47,8 @@ class EventsController < ApplicationController
 		sendEmail(usersInvited)
 
 		respond_to do |format|
-			format.html {render plain: "Invited users" }
-			format.json {render json: { status: 200, msg: usersInvited } }
+			format.html {render plain: "Invited users", status: 200 }
+			format.json {render json: { msg: usersInvited }, status: 200 }
 		end
 	end
 
@@ -80,7 +80,7 @@ class EventsController < ApplicationController
 		if !User.find_by(email: params[:email])
 			respond_to do |format|
 				format.html {render plain: "User doesn't exists" }
-				format.json {render json: { status: 400, msg: "User doesn't exists" } }
+				format.json {render json: { msg: "User doesn't exists" }, status: 400 }
 			end
 		end
 	end

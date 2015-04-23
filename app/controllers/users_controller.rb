@@ -7,18 +7,18 @@ class UsersController < ApplicationController
 
 		if User.find_by(email: params[:email])
 			respond_to do |format|
-				format.html {render plain: "User already exists" }
-				format.json {render json: { status: 400, msg: "User already exists" } }
+				format.html {render plain: "User already exists", status: 400 }
+				format.json {render json: { msg: "User already exists" }, status: 400 }
 			end
 		elsif user.save
 			respond_to do |format|
-				format.html {render plain: "User registered" }
-				format.json {render json: { status: 200, msg: "User registered" } }
+				format.html {render plain: "User registered", status: 200 }
+				format.json {render json: { msg: "User registered" }, status: 200 }
 			end
 		else
 			respond_to do |format|
-      			format.html {render plain: "Email or password is blank" }
-				format.json {render json: { status: 400, msg: "Email or password is blank"} }
+      			format.html {render plain: "Email or password is blank", status: 400 }
+				format.json {render json: { msg: "Email or password is blank"}, status: 400 }
     		end
 		end
 	end
@@ -26,13 +26,13 @@ class UsersController < ApplicationController
 	def sign_in
 		if User.where("email = ? AND password = ?", 	params[:email], params[:password]).blank?
 			respond_to do |format|
-				format.html {render plain: "Username or password incorrect" }
-				format.json {render json: { status: 400, msg: "Username or password incorrect" } }
+				format.html {render plain: "Username or password incorrect", status: 400 }
+				format.json {render json: { msg: "Username or password incorrect" }, status: 400 }
 			end
 		else
 			respond_to do |format|
-				format.html {render plain: "Signed in" }
-				format.json {render json: { status: 200, msg: "Signed in" } }
+				format.html {render plain: "Signed in", status: 200 }
+				format.json {render json: { msg: "Signed in" }, status: 200 }
 			end
 		end
 	end
@@ -44,18 +44,18 @@ class UsersController < ApplicationController
 
 		if User.where("email = ?", 	params[:email]).blank?
 			respond_to do |format|
-				format.html {render plain: "User doesn't exists" }
-				format.json {render json: { status: 400, msg: "User doesn't exists" } }
+				format.html {render plain: "User doesn't exists", status: 400 }
+				format.json {render json: { msg: "User doesn't exists" }, status: 400 }
 			end
 		elsif regId.save
 			respond_to do |format|
-				format.html {render plain: "User registered for GCM" }
-				format.json {render json: { status: 200, msg: "User registered for GCM" } }
+				format.html {render plain: "User registered for GCM", status: 200 }
+				format.json {render json: { msg: "User registered for GCM" }, status: 200 }
 			end
 		else
 			respond_to do |format|
-      			format.html {render plain: "Email or regid is blank" }
-				format.json {render json: { status: 400, msg: "Email or regid is blank"} }
+      			format.html {render plain: "Email or regid is blank", status: 400 }
+				format.json {render json: { msg: "Email or regid is blank"}, status: 400 }
     		end
 		end
 	end
