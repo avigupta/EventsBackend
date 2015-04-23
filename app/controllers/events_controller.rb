@@ -60,7 +60,7 @@ class EventsController < ApplicationController
 		users.each do |x|
 			if RegistrationId.find_by(email: x)
 				rUser = RegistrationId.find_by(email: x)
-				reg_ids << rUser.regId
+				reg_ids << rUser.regid
 			end
 		end
 		options = {data: {eventId: params[:eventId], email: params[:email]}, collapse_key: "updated_score"}
