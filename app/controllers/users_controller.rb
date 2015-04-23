@@ -40,7 +40,7 @@ class UsersController < ApplicationController
 	def gcm_reg_user
 		regId = RegistrationId.new
 		regId.email = params[:email]
-		regId.regId = params[:regid]
+		regId.regid = params[:regid]
 
 		if User.where("email = ?", 	params[:email]).blank?
 			respond_to do |format|
