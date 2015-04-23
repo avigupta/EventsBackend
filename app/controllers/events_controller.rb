@@ -63,7 +63,7 @@ class EventsController < ApplicationController
 				reg_ids << rUser.regid
 			end
 		end
-		options = {data: {eventId: params[:eventId], email: params[:email]}, collapse_key: "updated_score"}
+		options = {data: {type: 1, eventId: params[:eventId], email: params[:email]}, collapse_key: "updated_score"}
 		response = gcm.send(reg_ids, options)
 	end
 
