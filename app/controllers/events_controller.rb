@@ -15,7 +15,7 @@ class EventsController < ApplicationController
 		event.imageUrl = params[:imageUrl]
 		event.publicEvent = params[:publicEvent]
 		event.organization = params[:organization]
-	
+
 		if event.save
 			respond_to do |format|
 				format.html {render plain: "Event created. Id = #{event.id}", status: 200 }
@@ -26,6 +26,22 @@ class EventsController < ApplicationController
 				format.html {render plain: "Error in creating event", status: 400 }
 				format.json {render json: { msg: "Error in creating event" }, status: 400 }
 			end
+		end
+	end
+
+	def save_image
+		#image = Image.new
+		#image.event_id = params[:eventId]
+		#image.name = params[:imageName]
+		#image.image = params[:image]
+
+		puts "Event id: " + image.eventId
+		puts "Image name is: " + image.imageName
+		puts "Image data is: " + image.image
+
+		respond_to do |format|
+			format.html {render plain: "Image received", status: 200 }
+			format.json {render json: { eventId: params[:eventId], msg: "Image received" }, status: 200 }
 		end
 	end
 
@@ -45,7 +61,6 @@ class EventsController < ApplicationController
 			end
 		end
 	end
-			
 
 	def invite
 		usersInvited = Array.new

@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get 'users/gcm_register' => 'users#gcm_reg_user'
   get 'events/invite' => 'events#invite'
   get 'events/info' => 'events#info'
+  post 'events/save_image' => 'events#save_image'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
