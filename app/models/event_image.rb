@@ -11,4 +11,5 @@ class EventImage < ActiveRecord::Base
 					  }
 
 	#validates_attachment_content_type :image, :content_type => /\Aimage\/.*\Z/
+	validates_attachment :image, content_type: { content_type: ["image/jpg", "image/jpeg", "image/png", "image/gif"] }
 end
