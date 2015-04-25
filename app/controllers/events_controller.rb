@@ -121,6 +121,6 @@ class EventsController < ApplicationController
 	end
 
 	def image_params
-    	params.require(:friend).permit(:image, :eventId)
+    	params.require(:eventId).permit(:image, :eventId)
 	end
 end
