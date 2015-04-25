@@ -33,6 +33,7 @@ class EventsController < ApplicationController
 		eventImage = EventImage.new(image_params)
 
 		if eventImage.save
+			puts eventImage.image.url
       		respond_to do |format|
 				format.html {render plain: "Image received", status: 200 }
 				format.json {render json: { eventId: params[:eventId], msg: "Image received" }, status: 200 }
