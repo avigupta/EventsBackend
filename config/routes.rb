@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get 'events/invite' => 'events#invite'
   get 'events/info' => 'events#info'
   post 'events/save_image' => 'events#save_image'
+  get 'events/get_image' => 'events#get_image'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

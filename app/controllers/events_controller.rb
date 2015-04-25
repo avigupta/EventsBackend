@@ -44,8 +44,22 @@ class EventsController < ApplicationController
 				format.json {render json: { eventId: params[:eventId], msg: "Error saving image" }, status: 400 }
 			end
     	end
+	end
 
-		
+	def get_image
+		if EventImage.find(params[:eventId])
+			eventImage = EventImage.find(params[:eventId])
+			response_to do |format|
+				format.html {render plain: eventImage.image.url, status: 200 }
+				format.json {render json: { eventId: eventImage.eventId, url: eventImage.image.url }, status: 200 }
+			end
+		else
+			respond_to do |format|
+				format.html {render plain: "Invalid event id", status: 400 }
+				format.json {render json: { eventId: params[:eventId], msg: "Invalid event id" }, status: 400 }
+			end
+		end
+			
 	end
 
 	def info
@@ -57,7 +71,7 @@ class EventsController < ApplicationController
 					                        type: event.type, startTime: event.startTime, endTime: event.endTime, organization: event.organization,
 					                        publicEvent: event.publicEvent}, status: 200 }
 			end
-		elsif
+		else
 			respond_to do |format|
 				format.html {render plain: "Event not found", status: 400 }
 				format.json {render json: { msg: "Event not found" }, status: 400 }
