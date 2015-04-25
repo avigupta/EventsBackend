@@ -30,19 +30,21 @@ class EventsController < ApplicationController
 	end
 
 	def save_image
-		#image = Image.new
-		#image.event_id = params[:eventId]
-		#image.name = params[:imageName]
-		#image.image = params[:image]
+		eventImage = EventImage.new(image_params)
 
-		puts "Event id: " + params[:eventId] #image.eventId
-		puts "Image name is: " + params[:imageName] #image.imageName
-		puts "Image data is: " + params[:image] #image.image
+		if eventImage.save
+      		respond_to do |format|
+				format.html {render plain: "Image received", status: 200 }
+				format.json {render json: { eventId: params[:eventId], msg: "Image received" }, status: 200 }
+			end
+     	else
+       		respond_to do |format|
+				format.html {render plain: "Error saving image", status: 400 }
+				format.json {render json: { eventId: params[:eventId], msg: "Error saving image" }, status: 400 }
+			end
+    	end
 
-		respond_to do |format|
-			format.html {render plain: "Image received", status: 200 }
-			format.json {render json: { eventId: params[:eventId], msg: "Image received" }, status: 200 }
-		end
+		
 	end
 
 	def info
@@ -116,5 +118,9 @@ class EventsController < ApplicationController
 				format.json {render json: { msg: "User doesn't exists" }, status: 400 }
 			end
 		end
+	end
+
+	def image_params
+    	params.require(:friend).permit(:image, :eventId)
 	end
 end
