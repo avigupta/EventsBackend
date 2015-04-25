@@ -47,8 +47,8 @@ class EventsController < ApplicationController
 	end
 
 	def get_image
-		if EventImage.find(params[:eventId])
-			eventImage = EventImage.find(params[:eventId])
+		if EventImage.find_by(eventId: params[:eventId])
+			eventImage = EventImage.find_by(eventId: params[:eventId])
 			response_to do |format|
 				format.html {render plain: eventImage.image.url, status: 200 }
 				format.json {render json: { eventId: eventImage.eventId, url: eventImage.image.url }, status: 200 }
