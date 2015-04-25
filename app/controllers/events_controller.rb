@@ -84,6 +84,8 @@ class EventsController < ApplicationController
 		usersInvited = Array.new
 		list = params[:list].split(",")
 		eventId = params[:eventId]
+
+		eventName = Event.find(params[:eventId]).name
 		list.each do |x|
 			if Invitee.where("event_id = ? AND email = ?", params[:eventId], x).blank?
 				invitee = Invitee.new
@@ -94,7 +96,7 @@ class EventsController < ApplicationController
 				usersInvited << x
 			end
 		end
-		sendNotification(usersInvited)
+		sendNotification(usersInvited, eventName)
 		sendEmail(usersInvited)
 
 		respond_to do |format|
@@ -105,7 +107,7 @@ class EventsController < ApplicationController
 
 	private	
 
-	def sendNotification(users)
+	def sendNotification(users, eName)
 		gcm = GCM.new(API_KEY)
 		reg_ids = Array.new
 		users.each do |x|
@@ -114,7 +116,7 @@ class EventsController < ApplicationController
 				reg_ids << rUser.regid
 			end
 		end
-		options = {data: {type: 1, eventId: params[:eventId], email: params[:email]}, collapse_key: "updated_score"}
+		options = {data: {type: 1, eventId: params[:eventId], eventName: eName, email: params[:email]}, collapse_key: "updated_score"}
 		response = gcm.send(reg_ids, options)
 	end
 
