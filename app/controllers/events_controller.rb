@@ -35,9 +35,9 @@ class EventsController < ApplicationController
 		#image.name = params[:imageName]
 		#image.image = params[:image]
 
-		puts "Event id: " + image.eventId
-		puts "Image name is: " + image.imageName
-		puts "Image data is: " + image.image
+		puts "Event id: " + params[:eventId] #image.eventId
+		puts "Image name is: " + params[:imageName] #image.imageName
+		puts "Image data is: " + params[:image] #image.image
 
 		respond_to do |format|
 			format.html {render plain: "Image received", status: 200 }
