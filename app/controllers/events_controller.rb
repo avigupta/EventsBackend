@@ -46,31 +46,19 @@ class EventsController < ApplicationController
     	end
 	end
 
-	def get_image
+	def info
+		eventImage = ""
 		if EventImage.find_by(eventId: params[:eventId])
 			eventImage = EventImage.find_by(eventId: params[:eventId])
-			puts eventImage.image.url
-			respond_to do |format|
-				format.html {render plain: eventImage.image.url, status: 200 }
-				format.json {render json: { eventId: eventImage.eventId, url: eventImage.image.url }, status: 200 }
-			end
-		else
-			respond_to do |format|
-				format.html {render plain: "Invalid event id", status: 400 }
-				format.json {render json: { eventId: params[:eventId], msg: "Invalid event id" }, status: 400 }
-			end
 		end
-			
-	end
 
-	def info
 		if Event.find(params[:eventId])
 			event = Event.find(params[:eventId])
 			respond_to do |format|
 				format.html {render plain: event.id + " " + event.name, status: 200 }
 				format.json {render json: { eventId: event.id, name: event.name, location: event.location, description: event.description,
 					                        type: event.type, startTime: event.startTime, endTime: event.endTime, organization: event.organization,
-					                        publicEvent: event.publicEvent}, status: 200 }
+					                        publicEvent: event.publicEvent, imageUrl: eventImage.image.url}, status: 200 }
 			end
 		else
 			respond_to do |format|
