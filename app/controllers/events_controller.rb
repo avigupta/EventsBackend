@@ -78,7 +78,7 @@ class EventsController < ApplicationController
 			invitation = Invitee.find_by(event_id: params[:eventId], email: params[:email])
 			invitation.status = params[:status]
 			invitation.save
-			owner = Event.find_by(eventID: params[:eventId])
+			owner = Event.find_by(id: params[:eventId])
 			notifyOnwer(params[:eventId], owner.email, params[:email], params[:status])
 			respond_to do |format|
 				format.html{render plain: "Notified to owner", status: 200}
