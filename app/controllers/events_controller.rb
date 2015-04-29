@@ -79,7 +79,7 @@ class EventsController < ApplicationController
 			invitation.status = params[:status]
 			invitation.save
 			owner = Event.find_by(id: params[:eventId])
-			notifyOnwer(params[:eventId], owner.email, params[:email], params[:status])
+			notifyOnwer(params[:eventId], owner.name, params[:email], params[:status])
 			respond_to do |format|
 				format.html{render plain: "Notified to owner", status: 200}
 				format.json{json json: {msg: "Notified to owner"}, status: 200}
