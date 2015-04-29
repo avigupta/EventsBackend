@@ -69,7 +69,7 @@ class EventsController < ApplicationController
 	end
 
 	def respondToInvite
-		if not Invitee.where("event_id = ? AND email = ?", params[:eventId], params[:email]).blank?
+		if Invitee.where("event_id = ? AND email = ?", params[:eventId], params[:email]).blank?
 			respond_to do |format|
 				format.html {render plain: "Not invited to this event", status: 400}
 				format.json {render json: {msg: "Not invited to this event"}, status: 400}
