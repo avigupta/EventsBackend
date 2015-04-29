@@ -68,6 +68,25 @@ class EventsController < ApplicationController
 		end
 	end
 
+	def respondToInvite
+		if not Invitee.where("event_id = ? AND email = ?", params[:eventId], params[:email]).blank?
+			respond_to do |format|
+				format.html {render plain: "Not invited to this event", status: 400}
+				format.json {render json: {msg: "Not invited to this event"}, status: 400}
+			end
+		elsif
+			invitation = Invitee.find_by(event_id: params[:eventId], email: params[:email])
+			invitation.status = params[:status]
+			invitation.save
+			owner = Event.find_by(eventID: params[:eventId])
+			notifyOnwer(params[:eventId], owner.email, params[:email], params[:status])
+			respond_to do |format|
+				format.html{render plain: "Notified to owner", status: 200}
+				format.json{json json: {msg: "Notified to owner"}, status: 200}
+			end
+		end
+		
+
 	def invite
 		usersInvited = Array.new
 		list = params[:list].split(",")
@@ -84,8 +103,8 @@ class EventsController < ApplicationController
 				usersInvited << x
 			end
 		end
-		sendNotification(usersInvited, eventName)
-		sendEmail(usersInvited)
+		sendInviteNotification(usersInvited, eventName)
+		sendInviteEmail(usersInvited)
 
 		respond_to do |format|
 			format.html {render plain: "Invited users", status: 200 }
@@ -93,9 +112,17 @@ class EventsController < ApplicationController
 		end
 	end
 
-	private	
+	private
+	def notifyOwner(eventId, ownerEmail, userEmail, response)
+		gcm = GCM.new(API_KEY)
+		if RegistrationId.find_by(email: ownerEmail)
+			rOwner = RegistrationId.find_by(email: ownerEmail)
+			options = {data: {type: 2, eventId: eventId, email: userEmail, response: response}, collapse_key: "update_score"}
+			response = gcm.send(rOwner.regid, options)
+		end
 
-	def sendNotification(users, eName)
+
+	def sendInviteNotification(users, eName)
 		gcm = GCM.new(API_KEY)
 		reg_ids = Array.new
 		users.each do |x|
@@ -108,7 +135,7 @@ class EventsController < ApplicationController
 		response = gcm.send(reg_ids, options)
 	end
 
-	def sendEmail(users)
+	def sendInviteEmail(users)
 		users.each do |x|
 			if not RegistrationId.find_by(email: x)
 				#TODO: send email to the user
