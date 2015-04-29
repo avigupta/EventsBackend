@@ -15,6 +15,7 @@ class EventsController < ApplicationController
 		event.imageUrl = params[:imageUrl]
 		event.publicEvent = params[:publicEvent]
 		event.organization = params[:organization]
+		event.user_id = params[:email]
 
 		if event.save
 			respond_to do |format|
@@ -79,7 +80,7 @@ class EventsController < ApplicationController
 			invitation.status = params[:status]
 			invitation.save
 			owner = Event.find_by(id: params[:eventId])
-			notifyOwner(params[:eventId], owner.name, params[:email], params[:status])
+			notifyOwner(params[:eventId], owner.user_id, params[:email], params[:status])
 			respond_to do |format|
 				format.html{render plain: "Notified to owner", status: 200}
 				format.json{json json: {msg: "Notified to owner"}, status: 200}
