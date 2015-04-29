@@ -85,6 +85,7 @@ class EventsController < ApplicationController
 				format.json{json json: {msg: "Notified to owner"}, status: 200}
 			end
 		end
+	end
 		
 
 	def invite
@@ -120,6 +121,7 @@ class EventsController < ApplicationController
 			options = {data: {type: 2, eventId: eventId, email: userEmail, response: response}, collapse_key: "update_score"}
 			response = gcm.send(rOwner.regid, options)
 		end
+	end
 
 
 	def sendInviteNotification(users, eName)
