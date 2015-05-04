@@ -1,4 +1,6 @@
 class EventImage < ActiveRecord::Base	
+	belongs_to :event
+
 	has_attached_file :image,
 					:storage => :dropbox,
 					:dropbox_credentials => Rails.root.join("config/dropbox.yml"),

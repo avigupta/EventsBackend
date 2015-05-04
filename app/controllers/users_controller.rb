@@ -5,20 +5,15 @@ class UsersController < ApplicationController
 		user.email = params[:email]
 		user.password = params[:password]
 
-		if User.find_by(email: params[:email])
-			respond_to do |format|
-				format.html {render plain: "User already exists", status: 400 }
-				format.json {render json: { msg: "User already exists" }, status: 400 }
-			end
-		elsif user.save
+		if user.save
 			respond_to do |format|
 				format.html {render plain: "User registered", status: 200 }
 				format.json {render json: { msg: "User registered" }, status: 200 }
 			end
 		else
 			respond_to do |format|
-      			format.html {render plain: "Email or password is blank", status: 400 }
-				format.json {render json: { msg: "Email or password is blank"}, status: 400 }
+      			format.html {render plain: user.errors.messages, status: 400 }
+				format.json {render json: { msg: user.errors.messages}, status: 400 }
     		end
 		end
 	end
