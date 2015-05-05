@@ -56,6 +56,8 @@ class EventsController < ApplicationController
 			imageUrl = event.event_image.image.url
 		end
 		
+
+		puts "Details: " + event.id.to_s + " " + event.user.email + " " + event.name + " " + imageUrl
 		respond_to do |format|
 			format.html {render plain: event.id.to_s + " " + event.name + " " + event.user.email, status: 200 }
 			format.json {render json: { eventId: event.id, owner: event.user.email, name: event.name, location: event.location, description: event.description,
