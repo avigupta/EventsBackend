@@ -120,7 +120,7 @@ class EventsController < ApplicationController
 	def notifyOwner(invitee)
 		gcm = GCM.new(API_KEY)
 		if not invitee.event.user.registration_id.blank?
-			puts "Notify to user: " + invitee.event.id.to_s + " " + invitee.email + " " + invitee.status
+			puts "Notify to user: " + invitee.event.id.to_s + " " + invitee.email + " " + invitee.status + " " + invitee.event.user.email + "  " + invitee.event.user.registration_id.regid
 			options = {data: {type: 2, eventId: invitee.event.id, email: invitee.email, response: invitee.status}, collapse_key: "update_score"}
 			response = gcm.send(invitee.event.user.registration_id.regid, options)
 		end
