@@ -3,6 +3,7 @@ class EventsController < ApplicationController
 	API_KEY = "AIzaSyBFn_H4dERP9vPqyPBtpFhseCB79dwodfA"
 
 	before_action :authenticate_user
+	before_action :eventId_present, only: [:save_image, :info, :invite]
 
 	def create
 		event = Event.new
@@ -12,11 +13,9 @@ class EventsController < ApplicationController
 		event.type = params[:type]
 		event.startTime = params[:startTime]
 		event.endTime =  params[:endTime]
-		event.imageUrl = params[:imageUrl]
 		event.publicEvent = params[:publicEvent]
 		event.organization = params[:organization]
-		event.user_id = params[:email]
-
+		event.user = User.find_by(email: params[:email])
 		if event.save
 			respond_to do |format|
 				format.html {render plain: "Event created. Id = #{event.id}", status: 200 }
@@ -24,17 +23,19 @@ class EventsController < ApplicationController
 			end
 		elsif
 			respond_to do |format|
-				format.html {render plain: "Error in creating event", status: 400 }
-				format.json {render json: { msg: "Error in creating event" }, status: 400 }
+				format.html {render plain: event.errors.messages, status: 400 }
+				format.json {render json: { msg: event.errors.messages }, status: 400 }
 			end
 		end
 	end
 
 	def save_image
-		eventImage = EventImage.new(image_params)
-
-		if eventImage.save
-			puts eventImage.image.url
+		event = Event.find(params[:eventId])
+		if event.event_image.blank?
+			event.build_event_image
+		end
+		event.event_image.image = params[:image]
+		if event.event_image.save
       		respond_to do |format|
 				format.html {render plain: "Image received", status: 200 }
 				format.json {render json: { eventId: params[:eventId], msg: "Image received" }, status: 200 }
@@ -48,24 +49,18 @@ class EventsController < ApplicationController
 	end
 
 	def info
-		eventImage = ""
-		if EventImage.find_by(eventId: params[:eventId])
-			eventImage = EventImage.find_by(eventId: params[:eventId])
-		end
+		event = Event.find(params[:eventId])
 
-		if Event.find(params[:eventId])
-			event = Event.find(params[:eventId])
-			respond_to do |format|
-				format.html {render plain: event.id + " " + event.name, status: 200 }
-				format.json {render json: { eventId: event.id, name: event.name, location: event.location, description: event.description,
-					                        type: event.type, startTime: event.startTime, endTime: event.endTime, organization: event.organization,
-					                        publicEvent: event.publicEvent, imageUrl: eventImage.image.url}, status: 200 }
-			end
-		else
-			respond_to do |format|
-				format.html {render plain: "Event not found", status: 400 }
-				format.json {render json: { msg: "Event not found" }, status: 400 }
-			end
+		imageUrl = ""
+		if not event.event_image.blank?
+			imageUrl = event.event_image.image.url
+		end
+		
+		respond_to do |format|
+			format.html {render plain: event.id.to_s + " " + event.name + " " + event.user.email, status: 200 }
+			format.json {render json: { eventId: event.id, owner: event.user.email, name: event.name, location: event.location, description: event.description,
+				                        type: event.type, startTime: event.startTime, endTime: event.endTime, organization: event.organization,
+				                        publicEvent: event.publicEvent, imageUrl: imageUrl}, status: 200 }
 		end
 	end
 
@@ -76,11 +71,11 @@ class EventsController < ApplicationController
 				format.json {render json: {msg: "Not invited to this event"}, status: 400}
 			end
 		elsif
-			invitation = Invitee.find_by(event_id: params[:eventId], email: params[:email])
-			invitation.status = params[:status]
-			invitation.save
-			owner = Event.find_by(id: params[:eventId])
-			notifyOwner(params[:eventId], owner.user_id, params[:email], params[:status])
+			invitee = Invitee.find_by(event_id: params[:eventId], email: params[:email])
+			invitee.status = params[:status]
+			invitee.save
+			owner = invitee.event.user.email
+			notifyOwner(invitee)
 			respond_to do |format|
 				format.html{render plain: "Notified to owner", status: 200}
 				format.json{json json: {msg: "Notified to owner"}, status: 200}
@@ -90,59 +85,61 @@ class EventsController < ApplicationController
 		
 
 	def invite
-		usersInvited = Array.new
+		event = Event.find(params[:eventId])
 		list = params[:list].split(",")
-		eventId = params[:eventId]
 
-		eventName = Event.find(params[:eventId]).name
+		notify_users = Array.new
+		email_users = Array.new
+
 		list.each do |x|
-			if Invitee.where("event_id = ? AND email = ?", params[:eventId], x).blank?
+			if Invitee.where("event_id = ? AND email = ?", event.id, x).blank?
 				invitee = Invitee.new
 				invitee.email = x
-				invitee.event_id = params[:eventId]
+				invitee.event = event
 				invitee.status = "invited"
 				invitee.save
-				usersInvited << x
+				if User.where(email: invitee.email).blank?
+					email_users << invitee.email
+				else
+					notify_users << invitee.email
+				end
 			end
 		end
-		sendInviteNotification(usersInvited, eventName)
-		sendInviteEmail(usersInvited)
+		sendInviteNotification(notify_users, event)
+		sendInviteEmail(email_users, event)
 
 		respond_to do |format|
-			format.html {render plain: "Invited users", status: 200 }
-			format.json {render json: { msg: usersInvited }, status: 200 }
+			format.html {render plain: "Users invited to this event", status: 200 }
+			format.json {render json: { msg: "Users invited to this event" }, status: 200 }
 		end
 	end
 
 	private
-	def notifyOwner(eventId, ownerEmail, userEmail, response)
+	def notifyOwner(invitee)
 		gcm = GCM.new(API_KEY)
-		if RegistrationId.find_by(email: ownerEmail)
-			rOwner = RegistrationId.find_by(email: ownerEmail)
-			options = {data: {type: 2, eventId: eventId, email: userEmail, response: response}, collapse_key: "update_score"}
-			response = gcm.send(rOwner.regid, options)
+		if not invitee.event.user.registration_id.blank?
+			options = {data: {type: 2, eventId: invitee.event.id, email: invitee.email, response: invitee.status}, collapse_key: "update_score"}
+			response = gcm.send(invitee.event.user.registration_id.regid, options)
 		end
 	end
 
 
-	def sendInviteNotification(users, eName)
+	def sendInviteNotification(users, event)
 		gcm = GCM.new(API_KEY)
 		reg_ids = Array.new
 		users.each do |x|
-			if RegistrationId.find_by(email: x)
-				rUser = RegistrationId.find_by(email: x)
-				reg_ids << rUser.regid
+			user = User.find_by(email: x)
+			if not user.registration_id.blank?
+				reg_ids << user.registration_id.regid
 			end
 		end
-		options = {data: {type: 1, eventId: params[:eventId], eventName: eName, email: params[:email]}, collapse_key: "updated_score"}
+		options = {data: {type: 1, eventId: event.id, eventName: event.name, invitedBy: params[:email]}, collapse_key: "updated_score"}
 		response = gcm.send(reg_ids, options)
 	end
 
-	def sendInviteEmail(users)
+	def sendInviteEmail(users, event)
 		users.each do |x|
-			if not RegistrationId.find_by(email: x)
-				#TODO: send email to the user
-			end
+			# TODO: send email to the user
 		end
 	end
 
@@ -156,7 +153,12 @@ class EventsController < ApplicationController
 		end
 	end
 
-	def image_params
-    	params.permit(:image, :eventId)
+	def eventId_present
+		if !params[:eventId] or Event.where(id: params[:eventId]).blank?
+			respond_to do |format|
+				format.html {render plain: "Event not found with this id" }
+				format.json {render json: { msg: "Event not found with this id" }, status: 400 }
+			end
+		end
 	end
 end
