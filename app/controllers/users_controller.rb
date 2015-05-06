@@ -1,5 +1,10 @@
 class UsersController < ApplicationController
 
+	#def send_email
+	#	GalaMailer.invite_email("avinaash.gupta50@gmail.com", Event.first).deliver
+	# => render plain: "Email sent successfully"
+	#end
+
 	def sign_up
 		user = User.new
 		user.email = params[:email]

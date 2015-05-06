@@ -2,7 +2,7 @@ class EventsController < ApplicationController
 	require 'gcm'
 	API_KEY = "AIzaSyBFn_H4dERP9vPqyPBtpFhseCB79dwodfA"
 
-	before_action :authenticate_user
+	before_action :authenticate_user, except: [:respondToInvite]
 	before_action :eventId_present, only: [:save_image, :info, :invite]
 
 	def create
@@ -143,11 +143,8 @@ class EventsController < ApplicationController
 	end
 
 	def sendInviteEmail(users, event)
-		users.each do |x|
-			# TODO: send email to the user
-		end
+		GalaMailer.invite_email(users, event).deliver
 	end
-
 
 	def authenticate_user
 		if !User.find_by(email: params[:email])

@@ -1,0 +1,15 @@
+<h1>Hi <%= @user %></h1>
+<p>
+  You've been invited by <%= @event.user.email %> to the <%= @event.name %>.
+  
+  Event Details:
+
+  Venue: <%= @event.location %>
+  Description: <%= @event.description %>
+  Time: From <%= @event.startTime %> to <%= @event.endTime %>
+
+  <%= link_to "Accept", controller: 'events', action: 'respondToInvite', email: @user, eventId: @event.id, status: "accepted"%>
+  <%= link_to "Decline", controller: 'events', action: 'respondToInvite', email: @user, eventId: @event.id, status: "declined"%>
+  <%= link_to "May be", controller: 'events', action: 'respondToInvite', email: @user, eventId: @event.id, status: "undecided"%>
+
+</p>
