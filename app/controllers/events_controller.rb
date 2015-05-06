@@ -80,7 +80,7 @@ class EventsController < ApplicationController
 			notifyOwner(invitee)
 			respond_to do |format|
 				format.html{render plain: "Notified to owner", status: 200}
-				format.json{json json: {msg: "Notified to owner"}, status: 200}
+				format.json{render json: {msg: "Notified to owner"}, status: 200}
 			end
 		end
 	end
