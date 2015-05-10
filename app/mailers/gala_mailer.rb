@@ -16,5 +16,10 @@ class GalaMailer < ApplicationMailer
 	end
 
 	def delete_email(users, event)
+		users.each do |x|
+			@user = x
+			@event = event
+			mail(from: @event.user.email, to: @user, subject: @event.name + " has cancelled " + @event.name)
+		end
 	end
 end
