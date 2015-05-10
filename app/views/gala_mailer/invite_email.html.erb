@@ -1,8 +1,3 @@
-<% startTime = Time.at(@event.startTime.to_i)
-   endTime = Time.at(@event.endTime.to_i)
-   startTimeString = startTime.strftime("%b %d     %H:%M")	
-   endTimeString = endTime.strftime("%b %d     %H:%M")	
-%>
 <h1>Hi <%= @user %></h1>
 <p>
   You've been invited by <%= @event.user.email %> to the <%= @event.name %>.<br/><br/>
@@ -10,8 +5,8 @@
   <em>Event Details:</em><br/>
   Venue: <%= @event.location %><br/>
   Description: <%= @event.description %><br/>
-  From: <%= startTimeString %><br/> 
-  To: <%= endTimeString %><br/><br/>
+  From: <%= Time.at(@event.startTime.to_i).strftime("%b %d     %H:%M") %><br/> 
+  To: <%= Time.at(@event.endTime.to_i).strftime("%b %d     %H:%M") %><br/><br/>
 
   <em>
   <%= link_to "Accept", controller: 'events', action: 'respondToInvite', email: @user, eventId: @event.id, status: "accepted"%>
