@@ -5,8 +5,8 @@
   <em>Event Details:</em><br/>
   Venue: <%= @event.location %><br/>
   Description: <%= @event.description %><br/>
-  From: <%= Time.at(@event.startTime.to_i).strftime("%b %d     %H:%M") %><br/> 
-  To: <%= Time.at(@event.endTime.to_i).strftime("%b %d     %H:%M") %><br/><br/>
+  From: <%= Time.at(@event.startTime.to_i / 1000).strftime("%b %d     %H:%M") %><br/> 
+  To: <%= Time.at(@event.endTime.to_i / 1000).strftime("%b %d     %H:%M") %><br/><br/>
 
   <em>
   <%= link_to "Accept", controller: 'events', action: 'respondToInvite', email: @user, eventId: @event.id, status: "accepted"%>
