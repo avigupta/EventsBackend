@@ -8,6 +8,11 @@ class GalaMailer < ApplicationMailer
 	end
 
 	def edit_email(users, event)
+		users.each do |x|
+			@user = x
+			@event = event
+			mail(from: @event.user.email, to: @user, subject: @event.name + " has been updated")
+		end
 	end
 
 	def delete_email(users, event)
