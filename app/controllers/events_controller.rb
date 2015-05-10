@@ -45,9 +45,9 @@ class EventsController < ApplicationController
 			invitees = Invitee.where("event_id = ?", event.id)
 			invitees.each do |x|
 				if User.where(email: x).blank?
-					email_users << x
+					email_users << x.email
 				else
-					notify_users << x
+					notify_users << x.email
 				end
 			end
 			sendEditNotification(notify_users, event)
@@ -73,9 +73,9 @@ class EventsController < ApplicationController
 		invitees = Invitee.where("event_id = ?", event.id)
 		invitees.each do |x|
 			if User.where(email: x).blank?
-				email_users << x
+				email_users << x.email
 			else
-				notify_users << x
+				notify_users << x.email
 			end
 		end
 		sendEditNotification(notify_users, event)
