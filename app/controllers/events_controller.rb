@@ -78,8 +78,8 @@ class EventsController < ApplicationController
 				notify_users << x.email
 			end
 		end
-		sendEditNotification(notify_users, event)
-		sendEditEmail(email_users, event)
+		sendDeleteNotification(notify_users, event)
+		sendDeleteEmail(email_users, event)
 
 		event.destroy
 		respond_to do |format|
