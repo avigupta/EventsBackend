@@ -19,7 +19,7 @@ class GalaMailer < ApplicationMailer
 		users.each do |x|
 			@user = x
 			@event = event
-			mail(from: @event.user.email, to: @user, subject: @event.name + " has cancelled " + @event.name)
+			mail(from: @event.user.email, to: @user, subject: @event.user.email + " has cancelled " + @event.name)
 		end
 	end
 end

@@ -1,6 +1,6 @@
-<h1>Hi <%= @user %></h1>
+<h1>Hi <%= @user.split("@").first %></h1>
 <p>
-  <%= @event.user.email %> has updated the details of <%= @event.name %>.<br/><br/>
+  <%= @event.user.email.split("@").first %> has updated the details of <%= @event.name %>.<br/><br/>
 
   <em>Event Details:</em><br/>
   Venue: <%= @event.location %><br/>

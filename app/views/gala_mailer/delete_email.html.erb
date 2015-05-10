@@ -1,4 +1,4 @@
-<h1>Hi <%= @user %></h1>
+<h1>Hi <%= @user.split("@").first %></h1>
 <h2>
-  <%= @event.user.email %> has cancelled <%= @event.name %>.<br/><br/>
+  <%= @event.user.email.split("@").first %> has cancelled <%= @event.name %>.<br/><br/>
 </h2>
