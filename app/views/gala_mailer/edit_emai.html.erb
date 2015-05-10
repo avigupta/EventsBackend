@@ -1,12 +1,17 @@
+<% startTime = Time.at(@event.startTime)
+   endTime = Time.at(@event.endTime)
+   startTimeString = startTime.strftime("%b %d     %H:%M:")	
+   endTimeString = endTime.strftime("%b %d     %H:%M:")	
+%>
 <h1>Hi <%= @user %></h1>
 <p>
   <%= @event.user.email %> has updated the details of <%= @event.name %>.<br/><br/>
-  
+
   <em>Event Details:</em><br/>
   Venue: <%= @event.location %><br/>
   Description: <%= @event.description %><br/>
-  From: <%= @event.startTime %><br/> 
-  To: <%= @event.endTime %><br/><br/>
+  From: <%= startTimeString %><br/> 
+  To: <%= endTimeString %><br/><br/>
 
   <em>
   <%= link_to "Accept", controller: 'events', action: 'respondToInvite', email: @user, eventId: @event.id, status: "accepted"%>
