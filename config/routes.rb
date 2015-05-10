@@ -8,6 +8,9 @@ Rails.application.routes.draw do
   get 'events/info' => 'events#info'
   post 'events/save_image' => 'events#save_image'
   get 'events/respond' => 'events#respondToInvite'
+
+  get 'events/edit' => 'events#edit'
+  get 'events/delete' => 'events#delete'
   #get 'users/send_email' => 'users#send_email'
 
   # The priority is based upon order of creation: first created -> highest priority.

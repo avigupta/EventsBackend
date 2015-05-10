@@ -6,4 +6,10 @@ class GalaMailer < ApplicationMailer
 			mail(from: @event.user.email, to: @user, subject: 'Invitation to ' + @event.name)
 		end
 	end
+
+	def edit_email(users, event)
+	end
+
+	def delete_email(users, event)
+	end
 end

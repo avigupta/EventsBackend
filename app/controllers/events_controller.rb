@@ -3,7 +3,7 @@ class EventsController < ApplicationController
 	API_KEY = "AIzaSyBFn_H4dERP9vPqyPBtpFhseCB79dwodfA"
 
 	before_action :authenticate_user, except: [:respondToInvite]
-	before_action :eventId_present, only: [:save_image, :info, :invite]
+	before_action :eventId_present, only: [:edit, :delete, :save_image, :info, :invite]
 
 	def create
 		event = Event.new
@@ -26,6 +26,65 @@ class EventsController < ApplicationController
 				format.html {render plain: event.errors.messages, status: 400 }
 				format.json {render json: { msg: event.errors.messages }, status: 400 }
 			end
+		end
+	end
+
+	def edit
+		event = Event.find(params[:eventId])
+		event.name = params[:name]
+		event.location = params[:location]
+		event.description = params[:description]
+		event.type = params[:type]
+		event.startTime = params[:startTime]
+		event.endTime =  params[:endTime]
+		event.publicEvent = params[:publicEvent]
+		event.organization = params[:organization]
+		if event.save
+			notify_users = Array.new
+			email_users = Array.new
+			invitees = Invitee.where("event_id = ?", event.id)
+			invitees.each do |x|
+				if User.where(email: x).blank?
+					email_users << x
+				else
+					notify_users << x
+				end
+			end
+			sendEditNotification(notify_users, event)
+			sendEditEmail(email_users, event)
+
+			respond_to do |format|
+				format.html {render plain: "Event saved. Id = #{event.id}", status: 200 }
+				format.json {render json: { eventId: event.id, msg: "Event saved" }, status: 200 }
+			end
+		elsif
+			respond_to do |format|
+				format.html {render plain: event.errors.messages, status: 400 }
+				format.json {render json: { msg: event.errors.messages }, status: 400 }
+			end
+		end
+	end
+
+	def delete
+		event = Event.find(params[:eventId])
+
+		notify_users = Array.new
+		email_users = Array.new
+		invitees = Invitee.where("event_id = ?", event.id)
+		invitees.each do |x|
+			if User.where(email: x).blank?
+				email_users << x
+			else
+				notify_users << x
+			end
+		end
+		sendEditNotification(notify_users, event)
+		sendEditEmail(email_users, event)
+
+		event.destroy
+		respond_to do |format|
+			format.html {render plain: "Event Deleted. Id = #{event.id}", status: 200 }
+			format.json {render json: { eventId: event.id, msg: "Event deleted" }, status: 200 }
 		end
 	end
 
@@ -84,7 +143,6 @@ class EventsController < ApplicationController
 			end
 		end
 	end
-		
 
 	def invite
 		event = Event.find(params[:eventId])
@@ -128,6 +186,32 @@ class EventsController < ApplicationController
 		end
 	end
 
+	def sendDeleteNotification(users, event)
+		gcm = GCM.new(API_KEY)
+		reg_ids = Array.new
+		users.each do |x|
+			user = User.find_by(email: x)
+			if not user.registration_id.blank?
+				reg_ids << user.registration_id.regid
+			end
+		end
+		options = {data: {type: 4, eventId: event.id, eventName: event.name, invitedBy: params[:email]}, collapse_key: "updated_score"}
+		response = gcm.send(reg_ids, options)
+	end
+		
+
+	def sendEditNotification(users, event)
+		gcm = GCM.new(API_KEY)
+		reg_ids = Array.new
+		users.each do |x|
+			user = User.find_by(email: x)
+			if not user.registration_id.blank?
+				reg_ids << user.registration_id.regid
+			end
+		end
+		options = {data: {type: 3, eventId: event.id, eventName: event.name, invitedBy: params[:email]}, collapse_key: "updated_score"}
+		response = gcm.send(reg_ids, options)
+	end
 
 	def sendInviteNotification(users, event)
 		gcm = GCM.new(API_KEY)
@@ -140,6 +224,14 @@ class EventsController < ApplicationController
 		end
 		options = {data: {type: 1, eventId: event.id, eventName: event.name, invitedBy: params[:email]}, collapse_key: "updated_score"}
 		response = gcm.send(reg_ids, options)
+	end
+
+	def sendDeleteEmail(users, event)
+		GalaMailer.delete_email(users, event).deliver
+	end
+
+	def sendEditEmail(users, event)
+		GalaMailer.edit_email(users, event).deliver
 	end
 
 	def sendInviteEmail(users, event)
